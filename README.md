@@ -1,58 +1,66 @@
-# bp
-Numpy implementation of BP neural network
-# BP神经网络分类器
-# 简介
- 这个Python脚本实现了一个基于反向传播算法的神经网络分类器。该网络使用Sigmoid激活函数和交叉熵损失函数进行训练，并使用L2正则化来防止过拟合。该网络可以用于二分类问题。
-# 依赖
-numpy
-matplotlib
-scikit-learn
-# 前置工作
-导入必要的库：
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.datasets import make_moons
-from sklearn.model_selection import train_test_split
-```
-定义相关函数
-```python
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
-def sigmoid_derivative(x):
-    return x * (1 - x)
-def mean_squared_error(y_true, y_pred):
-    return np.mean((y_true - y_pred) ** 2)
-def cross_entropy_loss(y_true, y_pred):
-    m = y_true.shape[0]
-    return -np.sum(y_true * np.log(y_pred)) / m
-```
-定义BP神经网络类：
-```python
-class BPNeuralNetwork:
-    def __init__(self, input_size, hidden_size, output_size, reg_lambda, learning_rate=0.1):
-    def forward(self, X):
-    def backward(self, X, y, output):
-    def train(self, X, y, epochs=10000):
-    def predict(self, X):
-```
-生成数据集并分割：
-```python
-X, y = make_moons(n_samples=1000, noise=0.2, random_state=42)
-y = y.reshape(-1, 1)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-```
-创建并训练神经网络：
+BP神经网络（反向传播算法）实现及决策边界绘制
+# 项目简介
+该项目实现了一个简单的 BP神经网络，用于二分类问题。使用 make_moons 数据集，网络采用 反向传播（Backpropagation） 算法进行训练，支持 交叉熵损失 计算及 L2正则化。训练完成后，绘制了基于模型预测的决策边界图。
+# 依赖库
+numpy: 用于数学计算，矩阵运算。
+matplotlib: 用于绘制图形和决策边界。
+sklearn: 用于生成示例数据集及划分数据集。
+可以通过以下命令安装所需的库：
+pip install numpy matplotlib scikit-learn
+
+# 代码实现
+1.BPNeuralNetwork类 
+
+该类实现了一个带有单隐层的前馈神经网络。其主要方法包括：
+__init__：初始化神经网络，设置输入层、隐层、输出层的大小，初始化权重和偏置。
+forward：前向传播计算，输入数据通过网络传递得到输出。
+backward：反向传播计算，使用梯度下降优化模型参数。
+train：训练模型，通过反向传播更新权重，训练过程中定期输出损失值。
+predict：根据训练后的模型进行预测。
+
+2.损失函数
+均方误差（mean_squared_error）：用于计算预测结果与真实值之间的误差。
+交叉熵损失（cross_entropy_loss）：用于衡量模型输出概率与真实标签之间的差异，是二分类问题中常用的损失函数。
+
+3.正则化
+在网络训练过程中，L2正则化（也称权重衰减）被应用于权重更新时，以避免过拟合。正则化项加入到损失函数中，并在梯度计算时对权重进行调整。
+
+4.训练和可视化
+使用 make_moons 函数生成模拟的二分类数据集，数据具有一定的噪声。
+将数据集划分为训练集和测试集，训练集占80%，测试集占20%。
+训练完成后，使用 plot_decision_boundary 函数绘制决策边界图，通过可视化结果来验证模型的分类效果。
+
+# 代码说明
+初始化神经网络
 ```python
 nn = BPNeuralNetwork(input_size=2, hidden_size=10, output_size=1, learning_rate=0.1, reg_lambda=0)
-nn.train(X_train, y_train, epochs=10000)
-绘制决策边界：
+```
+input_size=2: 输入层大小，make_moons 生成的是二维数据。
+hidden_size=10: 隐藏层节点数，可以根据需要进行调整。
+output_size=1: 输出层节点数，二分类问题的输出为一个标量。
+learning_rate=0.1: 学习率，影响权重更新的步长。
+reg_lambda=0: 正则化系数，若为0表示不使用正则化。
+
+训练模型
 ```python
-def plot_decision_boundary(model, X, y):
-    #绘图代码
+nn.train(X_train, y_train, epochs=10000)
+```
+X_train, y_train: 训练集数据。
+epochs=10000: 训练的迭代次数。
+
+绘制决策边界
+```python
 plot_decision_boundary(nn, X_test, y_test)
 ```
-# 注意事项
-确保安装了所有依赖库。
-可以调整网络参数，如隐藏层大小、学习率和正则化参数，以获得更好的性能。
-该网络适用于二分类问题，对于多分类问题需要进行修改。
+该函数通过生成网格，预测每个网格点的分类结果，并绘制决策边界。最终，训练数据和测试数据将以散点图的形式展示在同一张图上。
+
+运行结果
+训练过程中，模型的损失值将逐渐下降，最终收敛。当训练完成后，程序将绘制出测试集的决策边界图。
+示例输出（训练过程中的损失输出）：
+Epoch 0/10000 - Loss: 0.694
+Epoch 1000/10000 - Loss: 0.316
+Epoch 2000/10000 - Loss: 0.267
+...
+决策边界图会展示出模型对输入数据的分类情况，决策边界通常呈现为一个清晰的分割线，能够将不同类别的数据分开。
+# 总结
+该项目演示了如何通过从零开始实现一个简单的 BP 神经网络，包括前向传播、反向传播、损失计算及参数优化等过程。通过实现正则化和可视化决策边界，可以更好地理解模型的训练过程和分类效果。
